@@ -1,76 +1,75 @@
 # MNIST Handwritten Digit Classification
 
-A machine learning project for training and evaluating models on the [MNIST dataset](http://yann.lecun.com/exdb/mnist/) — 70,000 grayscale images of handwritten digits (0–9), each 28×28 pixels.
+From-scratch NumPy neural network trained on the [Kaggle Digit Recognizer](https://www.kaggle.com/c/digit-recognizer) competition (MNIST-style 28×28 grayscale digits, labels 0–9).
 
 ## Overview
 
-MNIST is a classic benchmark for image classification. This project loads the dataset, trains a model to recognize digits, and reports accuracy on held-out test images.
+The notebook `main.ipynb`:
 
-## Dataset
-
-| Split      | Images | Labels |
-|------------|--------|--------|
-| Training   | 60,000 | 0–9    |
-| Test       | 10,000 | 0–9    |
-
-Each image is a single channel (grayscale), normalized to pixel values in `[0, 1]`.
+1. Loads competition data (download once via the Kaggle API)
+2. Splits training data into train / validation
+3. Trains a 2-layer network (ReLU + softmax) with mini-batch gradient descent
+4. Visualizes predictions and writes a Kaggle `submission.csv`
 
 ## Requirements
 
 - Python 3.9+
-- PyTorch (or TensorFlow — adjust commands below)
-- NumPy
+- A Kaggle account and API token ([create one here](https://www.kaggle.com/settings))
 
 ```bash
-pip install torch torchvision numpy
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
 ```
 
-## Project Structure
+## Secrets
+
+Do **not** commit API tokens.
+
+Set your token in the environment, or keep it in a local `.config` file that is gitignored:
+
+```bash
+export KAGGLE_API_TOKEN="your_token_here"
+```
+
+Or create `.config` locally:
+
+```
+KAGGLE_API_TOKEN = "your_token_here"
+```
+
+If this token was ever committed to git, revoke it on Kaggle and create a new one.
+
+## Project structure
 
 ```
 MNIST/
 ├── README.md
-├── train.py          # Training script
-├── evaluate.py       # Evaluation on test set
-├── model.py          # Model definition
-└── data/             # Downloaded MNIST files (optional cache)
+├── requirements.txt
+├── main.ipynb          # data load, train, evaluate, submit
+├── .config             # local secrets only (gitignored)
+└── data/               # downloaded CSVs (gitignored)
 ```
 
 ## Usage
 
-**Train a model**
+Open and run `main.ipynb` top to bottom.
 
-```bash
-python train.py
-```
-
-**Evaluate on the test set**
-
-```bash
-python evaluate.py
-```
+Expected validation accuracy with the default settings: roughly **90%+** (simple dense net; a CNN would score higher).
 
 ## Model
 
-A typical baseline is a small convolutional neural network (CNN):
-
-- Conv layers to extract spatial features from digit strokes
-- Pooling to reduce spatial dimensions
-- Fully connected layers for classification into 10 classes
-
-Expected test accuracy with a simple CNN: **~98–99%**.
-
-## Results
-
-| Model | Test Accuracy | Notes |
-|-------|---------------|-------|
-| —     | —             | Add results after training |
+- Input: 784 flattened pixels, scaled to `[0, 1]`
+- Hidden layer: 128 units, ReLU, He initialization
+- Output: 10-way softmax
+- Loss: cross-entropy (via softmax + one-hot targets)
+- Optimizer: mini-batch SGD
 
 ## References
 
 - LeCun, Y., Cortes, C., and Burges, C.J.C. [The MNIST Database](http://yann.lecun.com/exdb/mnist/)
-- [PyTorch MNIST tutorial](https://pytorch.org/tutorials/beginner/basics/quickstart_tutorial.html)
+- [Kaggle Digit Recognizer](https://www.kaggle.com/c/digit-recognizer)
 
 ## License
 
-MIT (or specify your license here)
+MIT
